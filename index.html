@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volante — dummy n.º 0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4ead6; --red:#e63b2e; --salmon:#f08a70; --green:#8fd14f; --dgreen:#2c7a34;
+  --maroon:#3a0f12; --lilac:#b9b3d9; --purple:#5b4b8a; --yellow:#f4c430;
+  --pw:min(420px,46vw,calc((100vh - 190px)*.75));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#17110f radial-gradient(ellipse at 50% 40%,#3a2a24 0%,#17110f 70%);color:var(--paper);
+  font-family:Jost,Futura,"Century Gothic",sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;overflow-x:hidden}
+header{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+header b{background:var(--red);color:#fff;padding:5px 10px 4px;font-weight:800;letter-spacing:.22em}
+header span{opacity:.6}
+main{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:10px 0}
+.book{position:relative;width:calc(var(--pw)*2);height:calc(var(--pw)*4/3);perspective:2600px;
+  transition:transform .9s cubic-bezier(.6,.05,.3,1);font-size:calc(var(--pw)/42)}
+.book.closed{transform:translateX(-25%)} .book.end{transform:translateX(25%)}
+.leaf{position:absolute;left:50%;top:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;
+  transition:transform 1.1s cubic-bezier(.6,.05,.3,1);cursor:pointer}
+.leaf.flipped{transform:rotateY(-180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:var(--paper);color:var(--maroon);
+  box-shadow:0 .5em 1.6em rgba(0,0,0,.4)}
+.face.back{transform:rotateY(180deg)}
+.face::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(40,10,5,.28),rgba(40,10,5,0) 9%,rgba(255,255,255,.06) 50%,rgba(0,0,0,0) 100%)}
+.face.back::after{background:linear-gradient(270deg,rgba(40,10,5,.28),rgba(40,10,5,0) 9%,rgba(255,255,255,.06) 50%,rgba(0,0,0,0) 100%)}
+.face svg.full{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* interiores */
+.pg{position:absolute;inset:0;padding:3.2em 3em 3.6em;display:flex;flex-direction:column}
+.folio{position:absolute;bottom:1.5em;left:3em;right:3em;display:flex;justify-content:space-between;font-size:.85em;letter-spacing:.2em;text-transform:uppercase;font-weight:700;opacity:.75}
+.kick{font-size:.95em;letter-spacing:.28em;text-transform:uppercase;font-weight:800}
+h2{font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:.01em}
+.serif{font-family:Newsreader,Georgia,serif}
+.tag{display:inline-block;align-self:flex-start;background:var(--red);color:#fff;font-weight:800;letter-spacing:.2em;text-transform:uppercase;padding:.35em .7em .25em;font-size:.9em}
+
+/* editorial */
+.edit h2{font-size:3.6em;margin:.5em 0 .5em}
+.edit p{font-family:Newsreader,Georgia,serif;font-size:1.32em;line-height:1.42;margin-bottom:.8em}
+.edit p:first-of-type::first-letter{font-family:Jost,sans-serif;font-weight:900;font-size:3.6em;float:left;line-height:.8;margin:.08em .1em 0 0;color:var(--red)}
+.cred{margin-top:auto;font-size:.9em;letter-spacing:.14em;text-transform:uppercase;line-height:1.7;border-top:.25em solid var(--maroon);padding-top:.8em}
+
+/* índice */
+.idx h2{font-size:5.4em;color:var(--red);margin:.15em 0 .35em}
+.idx ol{list-style:none;flex:1;display:flex;flex-direction:column}
+.idx li{flex:1;display:grid;grid-template-columns:3.4em 1fr auto;align-items:center;gap:.6em;border-top:.2em solid var(--maroon);padding:0 .6em;cursor:pointer;position:relative;transition:background .2s,color .2s,padding .2s}
+.idx li:last-child{border-bottom:.2em solid var(--maroon)}
+.idx li .n{font-weight:900;font-size:2.6em;color:var(--red);transition:color .2s}
+.idx li .a{font-size:.9em;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
+.idx li .t{font-family:Newsreader,Georgia,serif;font-size:1.65em;line-height:1.05;font-weight:600}
+.idx li .p{font-weight:800;font-size:1.3em}
+.idx li:hover,.idx li:focus-visible{background:var(--c,var(--red));color:var(--k,#fff);padding-left:1.4em;outline:none}
+.idx li:hover .n,.idx li:focus-visible .n{color:inherit}
+.hint{font-size:.85em;letter-spacing:.18em;text-transform:uppercase;margin-top:.9em;opacity:.7}
+
+/* aperturas */
+.open{color:var(--k,#fff);background:var(--c)}
+.open .num{font-weight:900;font-size:13em;line-height:.8;opacity:.9}
+.open h2{font-size:4.3em;margin:.25em 0 .3em}
+.open .by{font-size:1.25em;letter-spacing:.22em;text-transform:uppercase;font-weight:800}
+.open .dek{font-family:Newsreader,Georgia,serif;font-style:italic;font-size:1.55em;line-height:1.25;margin-top:.7em;max-width:17em}
+.open svg.motif{position:absolute;right:-3em;bottom:1em;width:22em;height:22em;opacity:.95}
+
+/* texto */
+.txt .head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:.25em solid var(--maroon);padding-bottom:.6em;margin-bottom:1.2em}
+.txt .head strong{font-size:1.5em;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.cols{column-count:2;column-gap:1.6em;font-family:Newsreader,Georgia,serif;font-size:1.12em;line-height:1.38;text-align:justify;hyphens:auto;flex:1;overflow:hidden}
+.cols p{margin-bottom:.7em;text-indent:1.2em}
+.cols p:first-child{text-indent:0}
+.cols p:first-child::first-letter{font-family:Jost,sans-serif;font-weight:900;font-size:3.4em;float:left;line-height:.8;margin:.08em .1em 0 0;color:var(--c,var(--red))}
+.pull{break-inside:avoid;border-top:.3em solid var(--c,var(--red));border-bottom:.3em solid var(--c,var(--red));padding:.6em 0;margin:.4em 0 .8em;
+  font-family:Jost,sans-serif;font-weight:800;text-transform:uppercase;font-size:1.25em;line-height:1.1;text-align:left;text-indent:0;color:var(--maroon);opacity:.55}
+
+/* contra */
+.contra{background:var(--red);color:#fff;align-items:flex-start;justify-content:flex-end}
+.contra h2{font-size:6em}
+.contra p{font-size:1.1em;letter-spacing:.22em;text-transform:uppercase;font-weight:700;margin-top:.8em}
+
+/* controles */
+footer{display:flex;align-items:center;gap:14px;padding:14px 20px 22px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;flex-wrap:wrap;justify-content:center}
+button{font:inherit;letter-spacing:inherit;text-transform:inherit;background:transparent;color:var(--paper);border:2px solid var(--paper);padding:8px 14px;cursor:pointer;font-weight:700}
+button:hover:not(:disabled){background:var(--red);border-color:var(--red);color:#fff}
+button:disabled{opacity:.3;cursor:default}
+#count{min-width:150px;text-align:center;opacity:.75}
+
+/* ficha de hover */
+#card{position:fixed;z-index:999;width:250px;pointer-events:none;opacity:0;transform:translateY(8px) rotate(-1.5deg);transition:opacity .18s,transform .18s;
+  background:var(--paper);color:var(--maroon);box-shadow:0 18px 40px rgba(0,0,0,.55)}
+#card.on{opacity:1;transform:none}
+#card .top{background:var(--c);color:var(--k);padding:14px 16px 12px;position:relative;overflow:hidden}
+#card .top i{font-style:normal;font-weight:900;font-size:64px;line-height:.8;display:block}
+#card .top b{display:block;font-weight:900;text-transform:uppercase;font-size:21px;line-height:.95;margin-top:10px}
+#card .bot{padding:12px 16px 14px}
+#card .bot em{font-family:Newsreader,Georgia,serif;font-size:15px;line-height:1.25;display:block}
+#card .bot small{display:flex;justify-content:space-between;margin-top:10px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:800}
+@media (prefers-reduced-motion:reduce){.leaf,.book{transition-duration:.01s}}
+</style>
+</head>
+<body>
+<header><b>Volante</b><span>Dummy n.º 0 · noviembre 2026</span></header>
+<main><div class="book closed" id="book"></div></main>
+<footer>
+  <button id="prev" aria-label="Página anterior">‹ Anterior</button>
+  <span id="count"></span>
+  <button id="next" aria-label="Página siguiente">Siguiente ›</button>
+  <button id="toIdx">Índice</button>
+</footer>
+<div id="card"><div class="top"><i></i><b></b></div><div class="bot"><em></em><small><span></span><span></span></small></div></div>
+
+<template id="cover">
+<svg class="full" viewBox="2 12 367 489" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Portada de Volante sobre la portada de Timón de febrero de 1940: un timonel aferrado a la rueda en plena tormenta">
+<image href="portada.jpg" width="377" height="530"/>
+<rect x="0" y="21" width="204" height="58" fill="#b8457f"/>
+<text x="12" y="67" font-family="Jost,Futura,'Century Gothic',sans-serif" font-weight="800" font-size="46" fill="#f6efe6" textLength="182" lengthAdjust="spacingAndGlyphs">VOLANTE</text>
+<circle cx="322" cy="466" r="37" fill="#f1e3ea"/><circle cx="322" cy="466" r="33" fill="#c8507f"/>
+<text x="322" y="471" text-anchor="middle" font-family="Jost,Futura,sans-serif" font-weight="800" font-size="24" fill="#fff">$50</text>
+<text x="322" y="484" text-anchor="middle" font-family="Jost,Futura,sans-serif" font-weight="700" font-size="7.5" fill="#fff" letter-spacing=".8">NOV. 2026</text>
+</svg>
+</template>
+
+<script>
+const LOREM=["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio praesent libero sed cursus ante dapibus diam. Sed nisi nulla quis sem at nibh elementum imperdiet duis sagittis ipsum.","Praesent mauris fusce nec tellus sed augue semper porta. Mauris massa vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.","Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor pellentesque nibh. Aenean quam in scelerisque sem at dolor. Maecenas mattis sed convallis tristique sem.","Proin ut ligula vel nunc egestas porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum nulla metus ullamcorper vel.","Nulla facilisi. Ut fringilla suspendisse potenti. Nunc feugiat mi a tellus consequat imperdiet. Vestibulum sapien proin quam etiam ultrices. Suspendisse in justo eu magna luctus suscipit."];
+const ART=[
+ {a:"José Vasconcelos",t:"La raza cósmica, un siglo después",k:"Archivo",d:"Relectura de la utopía mestiza de 1925: su promesa, sus sombras y lo que todavía se discute.",c:"#e63b2e",ink:"#fff",m:'<circle cx="130" cy="130" r="120" fill="none" stroke="#f4ead6" stroke-width="22"/><circle cx="130" cy="130" r="70" fill="#3a0f12"/><circle cx="130" cy="130" r="30" fill="#f08a70"/>'},
+ {a:"Jaime Torres Bodet",t:"La cartilla y el porvenir",k:"Archivo",d:"El poeta que quiso alfabetizar un país: educación, paz y palabra pública.",c:"#2c7a34",ink:"#fff",m:'<path d="M20,70 L130,100 L240,70 V210 L130,240 L20,210Z" fill="#f4ead6"/><path d="M130,100 V240" stroke="#3a0f12" stroke-width="8"/><path d="M40,110 l70,18 M40,140 l70,18 M40,170 l70,18 M150,128 l70,-18 M150,158 l70,-18 M150,188 l70,-18" stroke="#8fd14f" stroke-width="8"/>'},
+ {a:"Alex Karp",t:"La república tecnológica",k:"Debate",d:"Software, Estado y poder: el argumento del director de Palantir, leído y discutido desde México.",c:"#b9b3d9",ink:"#3a0f12",m:'<g fill="none" stroke="#5b4b8a" stroke-width="10"><path d="M30,60 H140 V130 H230 M30,130 H90 V200 H230 M140,130 V230"/></g><g fill="#3a0f12"><circle cx="30" cy="60" r="14"/><circle cx="230" cy="130" r="14"/><circle cx="30" cy="130" r="14"/><circle cx="230" cy="200" r="14"/><circle cx="140" cy="230" r="14"/></g>'},
+ {a:"Paulo Freire",t:"Pedagogía del oprimido, lección abierta",k:"Relectura",d:"Leer el mundo antes que la palabra: la educación como práctica de la libertad.",c:"#f4c430",ink:"#3a0f12",m:'<g fill="#3a0f12"><circle cx="70" cy="90" r="28"/><circle cx="190" cy="90" r="28"/><circle cx="130" cy="60" r="28"/><path d="M30,240 Q70,120 110,240Z M150,240 Q190,120 230,240Z"/></g><path d="M85,240 Q130,90 175,240Z" fill="#e63b2e"/>'},
+ {a:"Boaventura de Sousa Santos",t:"Epistemologías del Sur",k:"Debate",d:"Una ecología de saberes: pensar desde el Sur contra el desperdicio de la experiencia.",c:"#3a0f12",ink:"#f4ead6",m:'<circle cx="130" cy="130" r="112" fill="none" stroke="#f08a70" stroke-width="14"/><path d="M130,236 L96,130 H164Z" fill="#f4c430"/><path d="M130,24 L164,130 H96Z" fill="none" stroke="#f08a70" stroke-width="8"/><circle cx="130" cy="130" r="12" fill="#f4ead6"/>'}
+];
+const FIRST=4; // página de la primera apertura
+ART.forEach((x,i)=>x.p=FIRST+i*2);
+const sty=x=>`style="--c:${x.c};--k:${x.ink}"`;
+const folio=(n,side)=>`<div class="folio">${side?`<span>Volante · nov. 2026</span><span>${n}</span>`:`<span>${n}</span><span>Volante · nov. 2026</span>`}</div>`;
+const editorial=`<div class="pg edit"><span class="tag">Carta de navegación</span><h2>Cambio de máquina</h2>
+<p>En 1940 hubo una revista que se llamó Timón. De ella tomamos el oficio gráfico —tintas planas, figuras rotundas, una cabecera que se lee desde la otra acera— y lo ponemos a trabajar en otro siglo.</p>
+<p>Un timón gobierna un barco; un volante conduce cualquier máquina y también es una hoja que pasa de mano en mano. Las ideas que aquí se imprimen no se heredan: se ponen a discusión.</p>
+<p>Este es un número cero: la maqueta de lo que viene.</p>
+<div class="cred">Volante · revista de ideas<br>Dummy n.º 0 · Ciudad de México<br>Textos interiores simulados</div>${folio(2,0)}</div>`;
+const indice=`<div class="pg idx"><span class="kick">Noviembre 2026</span><h2>Índice</h2><ol>${ART.map((x,i)=>`<li tabindex="0" data-i="${i}" ${sty(x)}><span class="n">${i+1}</span><span><span class="a">${x.a}</span><br><span class="t">${x.t}</span></span><span class="p">${x.p}</span></li>`).join("")}</ol><div class="hint">Pasa el cursor · clic para ir a la página</div>${folio(3,1)}</div>`;
+const opener=(x,i)=>`<div class="pg open" ${sty(x)}><div class="num">${i+1}</div><span class="kick">${x.k}</span><h2>${x.t}</h2><div class="by">${x.a}</div><div class="dek">${x.d}</div><svg class="motif" viewBox="0 0 260 260">${x.m}</svg>${folio(x.p,0)}</div>`;
+const texto=(x,i)=>`<div class="pg txt" ${sty(x)}><div class="head"><strong>${x.a}</strong><span class="tag">Texto simulado</span></div><div class="cols">${LOREM.map((p,j)=>(j==2?`<div class="pull">Aquí va una cita destacada del texto</div>`:"")+`<p>${LOREM[(j+i)%5]}</p>`).join("")}<p>${LOREM[(i+2)%5]}</p><p>${LOREM[(i+4)%5]}</p></div>${folio(x.p+1,1)}</div>`;
+const contra=`<div class="pg contra"><svg class="full" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice"><circle cx="300" cy="300" r="190" fill="none" stroke="#3a0f12" stroke-width="40"/><path d="M300,110V300 M300,300L140,410 M300,300L460,410" stroke="#3a0f12" stroke-width="28"/><circle cx="300" cy="300" r="56" fill="#f4ead6" stroke="#3a0f12" stroke-width="14"/></svg><div style="position:relative"><h2>Volante</h2><p>Próximo número · diciembre 2026</p></div></div>`;
+
+// pliegos: [frente, vuelta]
+const faces=[document.getElementById("cover").innerHTML,editorial,indice];
+ART.forEach((x,i)=>{faces.push(opener(x,i),texto(x,i))});
+faces.push(contra);
+const book=document.getElementById("book"),leaves=[];
+for(let i=0;i<faces.length;i+=2){
+  const l=document.createElement("div");l.className="leaf";
+  l.innerHTML=`<div class="face front">${faces[i]}</div><div class="face back">${faces[i+1]}</div>`;
+  book.appendChild(l);leaves.push(l);
+}
+const N=leaves.length;let pos=0,target=0,topZ=100,timer=null;
+const rest=()=>leaves.forEach((l,i)=>{if(!l.dataset.moving)l.style.zIndex=l.classList.contains("flipped")?i+1:N-i});
+leaves.forEach(l=>l.addEventListener("transitionend",e=>{if(e.propertyName=="transform"&&e.target===l){delete l.dataset.moving;rest()}}));
+function ui(){
+  book.classList.toggle("closed",pos==0);book.classList.toggle("end",pos==N);
+  document.getElementById("prev").disabled=target==0;document.getElementById("next").disabled=target==N;
+  document.getElementById("count").textContent=pos==0?"Portada":pos==N?"Contraportada":`Páginas ${pos*2}–${pos*2+1}`;
+}
+function step(){
+  if(pos==target){timer=null;return}
+  const fwd=target>pos,l=leaves[fwd?pos:pos-1];
+  l.dataset.moving=1;l.style.zIndex=++topZ;l.classList.toggle("flipped",fwd);pos+=fwd?1:-1;ui();
+  timer=setTimeout(step,130);
+}
+function go(t){target=Math.max(0,Math.min(N,t));ui();if(!timer)step()}
+rest();ui();
+book.addEventListener("click",e=>{
+  const li=e.target.closest(".idx li");
+  if(li){hide();go(Math.floor(ART[li.dataset.i].p/2));return}
+  const l=e.target.closest(".leaf");if(!l)return;
+  go(l.classList.contains("flipped")?target-1:target+1);
+});
+document.getElementById("prev").onclick=()=>go(target-1);
+document.getElementById("next").onclick=()=>go(target+1);
+document.getElementById("toIdx").onclick=()=>go(1);
+addEventListener("keydown",e=>{
+  if(e.key=="ArrowRight")go(target+1);else if(e.key=="ArrowLeft")go(target-1);
+  else if(e.key=="Enter"&&document.activeElement.matches&&document.activeElement.matches(".idx li"))document.activeElement.click();
+});
+// ficha de mouse-over en el índice
+const card=document.getElementById("card");
+function show(li,x,y){
+  const a=ART[li.dataset.i];card.style.setProperty("--c",a.c);card.style.setProperty("--k",a.ink);
+  card.querySelector("i").textContent=+li.dataset.i+1;card.querySelector("b").textContent=a.t;
+  card.querySelector("em").textContent=a.d;const s=card.querySelectorAll("small span");s[0].textContent=a.a;s[1].textContent="pág. "+a.p+" →";
+  move(x,y);card.classList.add("on");
+}
+function move(x,y){
+  const w=250,h=card.offsetHeight||220;let L=x+22,T=y-h/2;
+  if(L+w>innerWidth-8)L=x-w-22;T=Math.max(8,Math.min(innerHeight-h-8,T));
+  card.style.left=L+"px";card.style.top=T+"px";
+}
+function hide(){card.classList.remove("on")}
+book.addEventListener("mouseover",e=>{const li=e.target.closest(".idx li");if(li)show(li,e.clientX,e.clientY)});
+book.addEventListener("mousemove",e=>{if(e.target.closest(".idx li"))move(e.clientX,e.clientY);else hide()});
+book.addEventListener("mouseleave",hide);
+book.addEventListener("focusin",e=>{const li=e.target.closest(".idx li");if(li){const r=li.getBoundingClientRect();show(li,r.right,r.top+r.height/2)}});
+book.addEventListener("focusout",hide);
+</script>
+</body>
+</html>
